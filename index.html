@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locum Tenens vs W-2 — Deep Financial Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #2a3140;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --accent-w2: #58a6ff;
+    --accent-w2-dim: rgba(88,166,255,.12);
+    --accent-loc: #3fb950;
+    --accent-loc-dim: rgba(63,185,80,.12);
+    --accent-warn: #d29922;
+    --accent-red: #f85149;
+    --accent-purple: #bc8cff;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .page-header {
+    text-align: center;
+    padding: 48px 24px 32px;
+    background: linear-gradient(180deg, #131820 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .page-header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    background: linear-gradient(135deg, var(--accent-w2), var(--accent-loc));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .page-header p {
+    color: var(--text2);
+    margin-top: 8px;
+    font-size: .95rem;
+    max-width: 640px;
+    margin-inline: auto;
+  }
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+  }
+  .inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .card h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h2 .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-w2 { background: var(--accent-w2); }
+  .dot-loc { background: var(--accent-loc); }
+  .dot-shared { background: var(--accent-purple); }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: .82rem;
+    color: var(--text2);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .field label .hint {
+    font-size: .72rem;
+    color: var(--text2);
+    opacity: .7;
+  }
+  .field input, .field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .92rem;
+    transition: border-color .2s;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--accent-w2);
+  }
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .section-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--accent-purple);
+    font-weight: 600;
+    margin: 16px 0 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .toggle-row label {
+    font-size: .85rem;
+    color: var(--text2);
+    cursor: pointer;
+  }
+  .toggle {
+    position: relative;
+    width: 44px; height: 24px;
+    appearance: none;
+    background: var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .toggle:checked { background: var(--accent-loc); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .2s;
+  }
+  .toggle:checked::after { transform: translateX(20px); }
+  .results-header {
+    text-align: center;
+    margin: 40px 0 24px;
+  }
+  .results-header h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .sum-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .sum-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .sum-card.w2::before { background: var(--accent-w2); }
+  .sum-card.loc::before { background: var(--accent-loc); }
+  .sum-card.diff::before { background: var(--accent-warn); }
+  .sum-card .label { font-size: .78rem; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  .sum-card .value {
+    font-family: 'Fraunces', serif;
+    font-size: 1.7rem;
+    font-weight: 800;
+    margin: 6px 0 2px;
+  }
+  .sum-card.w2 .value { color: var(--accent-w2); }
+  .sum-card.loc .value { color: var(--accent-loc); }
+  .sum-card .sub { font-size: .8rem; color: var(--text2); }
+  .winner-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-top: 6px;
+  }
+  .winner-badge.w2-wins { background: var(--accent-w2-dim); color: var(--accent-w2); }
+  .winner-badge.loc-wins { background: var(--accent-loc-dim); color: var(--accent-loc); }
+  .breakdown {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+  }
+  .breakdown-title {
+    padding: 16px 24px;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .b-table { width: 100%; border-collapse: collapse; }
+  .b-table th, .b-table td {
+    padding: 10px 20px;
+    font-size: .85rem;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+  }
+  .b-table th:first-child, .b-table td:first-child {
+    text-align: left;
+    color: var(--text2);
+    font-weight: 500;
+  }
+  .b-table th {
+    background: var(--surface2);
+    font-weight: 600;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text2);
+  }
+  .b-table th:nth-child(2) { color: var(--accent-w2); }
+  .b-table th:nth-child(3) { color: var(--accent-loc); }
+  .b-table tr:last-child td { border-bottom: none; }
+  .b-table .row-section td {
+    background: var(--surface2);
+    font-weight: 700;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text2);
+    padding: 8px 20px;
+  }
+  .b-table .row-total td {
+    font-weight: 700;
+    background: rgba(255,255,255,.03);
+  }
+  .b-table .row-total td:nth-child(2) { color: var(--accent-w2); }
+  .b-table .row-total td:nth-child(3) { color: var(--accent-loc); }
+  .negative { color: var(--accent-red) !important; }
+  .positive { color: var(--accent-loc) !important; }
+  .bar-compare {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .bar-label {
+    width: 110px;
+    font-size: .8rem;
+    color: var(--text2);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .bar-track {
+    flex: 1;
+    height: 28px;
+    background: var(--bg);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width .5s ease;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: .75rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .bar-fill.w2 { background: var(--accent-w2); }
+  .bar-fill.loc { background: var(--accent-loc); }
+  .notes {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-top: 28px;
+    box-shadow: var(--shadow);
+  }
+  .notes h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+  .notes ul { padding-left: 18px; }
+  .notes li {
+    font-size: .83rem;
+    color: var(--text2);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+  .notes li strong { color: var(--text); }
+  @media (max-width: 700px) {
+    .b-table th, .b-table td { padding: 8px 10px; font-size: .78rem; }
+    .bar-label { width: 80px; font-size: .72rem; }
+  }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Locum Tenens vs W-2 Employment</h1>
+  <p>Deep financial comparison including taxes, benefits, S-Corp savings, retirement sheltering, write-offs, and true take-home pay</p>
+</div>
+
+<div class="container">
+  <div class="inputs-grid">
+
+    <!-- W-2 Inputs -->
+    <div class="card">
+      <h2><span class="dot dot-w2"></span> W-2 Employment</h2>
+      <div class="field">
+        <label>Annual Base Salary</label>
+        <input type="text" id="w2Salary" value="300,000" oninput="recalc()">
+      </div>
+      <div class="field">
+        <label>Overtime Pay <span class="hint">annual total, $</span></label>
+        <input type="text" id="w2Overtime" value="0" oninput="recalc()">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Signing Bonus</label>
+          <input type="text" id="w2Bonus" value="0" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>CME Allowance</label>
+          <input type="text" id="w2CME" value="3,000" oninput="recalc()">
+        </div>
+      </div>
+
+      <div class="section-label">Benefits</div>
+      <div class="field">
+        <label>Health/Dental/Vision <span class="hint">your share / yr</span></label>
+        <input type="text" id="w2HealthPrem" value="3,600" oninput="recalc()">
+      </div>
+      <div class="field">
+        <label>Employer Health Contribution <span class="hint">employer pays / yr</span></label>
+        <input type="text" id="w2HealthEmpl" value="18,000" oninput="recalc()">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Malpractice <span class="hint">employer-paid</span></label>
+          <input type="text" id="w2Malpractice" value="15,000" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>Disability/Life <span class="hint">employer-paid</span></label>
+          <input type="text" id="w2Disability" value="4,000" oninput="recalc()">
+        </div>
+      </div>
+      <div class="field">
+        <label>PTO Days <span class="hint">vacation + holidays + sick</span></label>
+        <input type="text" id="w2PTO" value="30" oninput="recalc()">
+      </div>
+
+      <div class="section-label">Retirement</div>
+      <div class="field">
+        <label>Your 401k Contribution <span class="hint">% of base salary, max $23k</span></label>
+        <input type="text" id="w2401kPct" value="8" oninput="recalc()">
+      </div>
+      <div class="field">
+        <label>Employer 401k Match <span class="hint">% of salary</span></label>
+        <input type="text" id="w2Match" value="4" oninput="recalc()">
+      </div>
+    </div>
+
+    <!-- Locum Inputs -->
+    <div class="card">
+      <h2><span class="dot dot-loc"></span> Locum Tenens (1099)</h2>
+      <div class="field">
+        <label>Hourly Rate <span class="hint">$/hr</span></label>
+        <input type="text" id="locRate" value="200" oninput="recalc()">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Hours / Week</label>
+          <input type="text" id="locHours" value="40" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>Weeks Worked / Yr</label>
+          <input type="text" id="locWeeks" value="48" oninput="recalc()">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Sign-On Bonus <span class="hint">taxable</span></label>
+          <input type="text" id="locSignOn" value="0" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>Relocation Bonus <span class="hint">taxable</span></label>
+          <input type="text" id="locRelocation" value="0" oninput="recalc()">
+        </div>
+      </div>
+      <div class="field">
+        <label>Travel Reimbursement <span class="hint">annual total — non-taxable</span></label>
+        <input type="text" id="locTravelReimb" value="0" oninput="recalc()">
+      </div>
+
+      <div class="section-label">Self-Funded Benefits</div>
+      <div class="field">
+        <label>Health Insurance <span class="hint">your cost / yr</span></label>
+        <input type="text" id="locHealth" value="12,000" oninput="recalc()">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Malpractice/Tail <span class="hint">annual</span></label>
+          <input type="text" id="locMalpractice" value="8,000" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>Disability Ins <span class="hint">annual</span></label>
+          <input type="text" id="locDisability" value="5,000" oninput="recalc()">
+        </div>
+      </div>
+      <div class="field">
+        <label>Other Business Expenses <span class="hint">licensing, CME, home office, etc</span></label>
+        <input type="text" id="locBizExp" value="15,000" oninput="recalc()">
+      </div>
+
+      <div class="section-label">Retirement — Solo 401k</div>
+      <div class="field">
+        <label>Employee Deferral <span class="hint">you → your 401k (max $23,000)</span></label>
+        <input type="text" id="loc401kEmployee" value="23,000" oninput="recalc()">
+      </div>
+      <div class="field">
+        <label>Employer Profit-Sharing <span class="hint">your biz → your 401k</span></label>
+        <input type="text" id="loc401kEmployer" value="45,000" oninput="recalc()">
+      </div>
+      <div style="font-size:.72rem;color:var(--text2);margin-bottom:10px;opacity:.7;line-height:1.5;">
+        Combined cap: $69,000 (under 50) / $76,500 (50+) · Employee deferral hard-capped at $23,000 · Employer portion limited to 25% of S-Corp W-2 salary or ~20% of sole prop adjusted net
+      </div>
+
+      <div class="section-label">S-Corp Election</div>
+      <div class="toggle-row" style="border:none;margin:0;padding:6px 0;">
+        <label for="locSCorp">Use S-Corp Election?</label>
+        <input type="checkbox" class="toggle" id="locSCorp" checked onchange="recalc()">
+      </div>
+      <div class="field" id="salaryField" style="margin-top:10px;">
+        <label>Reasonable Salary <span class="hint">W-2 you pay yourself</span></label>
+        <input type="text" id="locSCorpSalary" value="180,000" oninput="recalc()">
+      </div>
+    </div>
+
+    <!-- Shared / Tax Inputs -->
+    <div class="card">
+      <h2><span class="dot dot-shared"></span> Tax & Filing Details</h2>
+      <div class="field">
+        <label>Filing Status</label>
+        <select id="filingStatus" onchange="recalc()">
+          <option value="single">Single</option>
+          <option value="mfj" selected>Married Filing Jointly</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Spouse W-2 Income <span class="hint">if applicable</span></label>
+        <input type="text" id="spouseIncome" value="0" oninput="recalc()">
+      </div>
+      <div class="field">
+        <label>State Income Tax Rate <span class="hint">effective %</span></label>
+        <input type="text" id="stateRate" value="4.4" oninput="recalc()">
+      </div>
+      <div class="field">
+        <label>Itemized Deductions <span class="hint">mortgage int + SALT + charity</span></label>
+        <input type="text" id="itemized" value="20,000" oninput="recalc()">
+      </div>
+      <div class="field">
+        <label>Other Deductions <span class="hint">HSA, IRA, student loan int</span></label>
+        <input type="text" id="otherDed" value="0" oninput="recalc()">
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-header"><h2>Results Breakdown</h2></div>
+  <div class="summary-cards" id="summaryCards"></div>
+  <div class="card" style="margin-bottom:28px;">
+    <h2 style="font-size:.95rem;">Visual Comparison</h2>
+    <div id="barsContainer"></div>
+  </div>
+  <div class="breakdown">
+    <div class="breakdown-title">Full Line-by-Line Breakdown</div>
+    <table class="b-table">
+      <thead><tr><th>Item</th><th>W-2</th><th>Locum / 1099</th></tr></thead>
+      <tbody id="breakdownBody"></tbody>
+    </table>
+  </div>
+
+  <div class="notes">
+    <h3>Methodology & Key Assumptions</h3>
+    <ul>
+      <li><strong>Federal Tax Brackets:</strong> Uses 2024 brackets (10%, 12%, 22%, 24%, 32%, 35%, 37%). Taxable income = AGI minus the greater of standard or itemized deductions.</li>
+      <li><strong>Self-Employment Tax:</strong> 15.3% on 92.35% of net SE income (Social Security on first $168,600, Medicare uncapped). The deductible half of SE tax is accounted for.</li>
+      <li><strong>S-Corp Savings:</strong> Only the "reasonable salary" owes FICA (7.65% employee + 7.65% employer). Distributions above salary avoid SE tax. The employer-side FICA is a deductible business expense.</li>
+      <li><strong>Solo 401k — Employee Deferral:</strong> This is money YOU put in, just like contributing to a regular 401k at a job. Hard-capped at $23,000/yr (under 50). Reduces your taxable income dollar for dollar.</li>
+      <li><strong>Solo 401k — Employer Profit-Sharing:</strong> Since you own the business, your business can ALSO contribute on top of the employee deferral. Limited to 25% of your S-Corp W-2 salary, or ~20% of sole prop adjusted net. Combined with employee deferral, the total cap is $69,000 ($76,500 if 50+).</li>
+      <li><strong>W-2 401k:</strong> Your chosen contribution % applied to base salary (capped at $23k), plus employer match. Overtime and bonuses not included in 401k calculation.</li>
+      <li><strong>Overtime Pay (W-2):</strong> Added to gross income, subject to all taxes. Not included in 401k contribution base (most employer plans use base salary only).</li>
+      <li><strong>Travel Reimbursement (Locum):</strong> Treated as accountable plan reimbursement — non-taxable, not included in gross income. Directly increases your take-home without tax impact.</li>
+      <li><strong>Sign-On / Relocation Bonuses (Locum):</strong> Treated as taxable income added to gross revenue.</li>
+      <li><strong>QBI Deduction:</strong> Not modeled (phases out above $383,900 MFJ for specified service trades like medicine).</li>
+      <li><strong>Additional Medicare Tax:</strong> 0.9% on earnings above $200k (single) / $250k (MFJ).</li>
+      <li><strong>PTO Value:</strong> W-2 PTO valued at daily rate (salary ÷ 260 working days). Locum unpaid days off reduce gross income instead.</li>
+      <li><strong>Write-offs (Locum):</strong> Business expenses deducted before SE tax and income tax. Includes health, malpractice, disability, travel, lodging, licensing, CME, home office, phone, equipment.</li>
+      <li><strong>Colorado:</strong> Default state rate 4.4% flat. Adjust for your state.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function pn(v) { return parseFloat(String(v).replace(/[^0-9.\-]/g, '')) || 0; }
+function fmt(n) { return n < 0 ? '-$' + Math.abs(Math.round(n)).toLocaleString() : '$' + Math.round(n).toLocaleString(); }
+function pct(n) { return (n * 100).toFixed(1) + '%'; }
+
+function fedTax(taxable, status) {
+  const brackets = {
+    single:  [[11600,.10],[47150,.12],[100525,.22],[191950,.24],[243725,.32],[609350,.35],[Infinity,.37]],
+    mfj:     [[23200,.10],[94300,.12],[201050,.22],[383900,.24],[487450,.32],[731200,.35],[Infinity,.37]],
+    hoh:     [[16550,.10],[63100,.12],[100500,.22],[191950,.24],[243700,.32],[609350,.35],[Infinity,.37]],
+  };
+  let b = brackets[status] || brackets.single;
+  let tax = 0, prev = 0;
+  for (let [lim, rate] of b) {
+    if (taxable <= 0) break;
+    let chunk = Math.min(taxable, lim - prev);
+    tax += chunk * rate;
+    taxable -= chunk;
+    prev = lim;
+  }
+  return Math.max(tax, 0);
+}
+
+function stdDeduction(status) {
+  return { single: 14600, mfj: 29200, hoh: 21900 }[status] || 14600;
+}
+
+function recalc() {
+  const w2Sal = pn(document.getElementById('w2Salary').value);
+  const w2Overtime = pn(document.getElementById('w2Overtime').value);
+  const w2MatchPct = pn(document.getElementById('w2Match').value) / 100;
+  const w2HealthPrem = pn(document.getElementById('w2HealthPrem').value);
+  const w2HealthEmpl = pn(document.getElementById('w2HealthEmpl').value);
+  const w2CME = pn(document.getElementById('w2CME').value);
+  const w2Bonus = pn(document.getElementById('w2Bonus').value);
+  const w2Malpractice = pn(document.getElementById('w2Malpractice').value);
+  const w2Disability = pn(document.getElementById('w2Disability').value);
+  const w2PTO = pn(document.getElementById('w2PTO').value);
+  const w2401kPct = pn(document.getElementById('w2401kPct').value) / 100;
+
+  const locRate = pn(document.getElementById('locRate').value);
+  const locHours = pn(document.getElementById('locHours').value);
+  const locWeeks = pn(document.getElementById('locWeeks').value);
+  const locSignOn = pn(document.getElementById('locSignOn').value);
+  const locRelocation = pn(document.getElementById('locRelocation').value);
+  const locTravelReimb = pn(document.getElementById('locTravelReimb').value);
+  const locHealth = pn(document.getElementById('locHealth').value);
+  const locMalp = pn(document.getElementById('locMalpractice').value);
+  const locDisab = pn(document.getElementById('locDisability').value);
+  const locBiz = pn(document.getElementById('locBizExp').value);
+  const loc401kEE_input = pn(document.getElementById('loc401kEmployee').value);
+  const loc401kER_input = pn(document.getElementById('loc401kEmployer').value);
+  const useSCorp = document.getElementById('locSCorp').checked;
+  const scorpSalary = pn(document.getElementById('locSCorpSalary').value);
+
+  const status = document.getElementById('filingStatus').value;
+  const spouseInc = pn(document.getElementById('spouseIncome').value);
+  const stateRate = pn(document.getElementById('stateRate').value) / 100;
+  const itemized = pn(document.getElementById('itemized').value);
+  const otherDed = pn(document.getElementById('otherDed').value);
+
+  document.getElementById('salaryField').style.display = useSCorp ? 'block' : 'none';
+
+  const ssCap = 168600;
+  const addlMedThresh = status === 'mfj' ? 250000 : 200000;
+
+  // ===== W-2 CALCULATIONS =====
+  const w2Gross = w2Sal + w2Overtime + w2Bonus;
+  const w2_401k_employee = Math.min(w2Sal * w2401kPct, 23000);
+  const w2_401k_match = Math.min(w2Sal * w2MatchPct, 23000);
+  const w2_401k_total = w2_401k_employee + w2_401k_match;
+
+  const w2SS = Math.min(w2Gross, ssCap) * 0.062;
+  const w2Med = w2Gross * 0.0145;
+  const w2AddlMed = Math.max(0, w2Gross - addlMedThresh) * 0.009;
+  const w2FICA = w2SS + w2Med + w2AddlMed;
+
+  const w2AGI = w2Gross - w2_401k_employee - otherDed + spouseInc;
+  const w2Deduction = Math.max(stdDeduction(status), itemized);
+  const w2Taxable = Math.max(0, w2AGI - w2Deduction);
+  const w2FedTax = fedTax(w2Taxable, status);
+  const w2StateTax = w2Taxable * stateRate;
+
+  const w2TotalTax = w2FedTax + w2StateTax + w2FICA;
+  const w2TakeHome = w2Gross - w2TotalTax - w2_401k_employee - w2HealthPrem;
+
+  const w2TotalComp = w2Gross + w2HealthEmpl + w2Malpractice + w2Disability + w2CME + w2_401k_match;
+  const w2EffRate = w2Gross > 0 ? w2TotalTax / w2Gross : 0;
+  const w2PTOValue = (w2Sal / 260) * w2PTO;
+
+  // ===== LOCUM CALCULATIONS =====
+  const locHourlyGross = locRate * locHours * locWeeks;
+  const locGross = locHourlyGross + locSignOn + locRelocation;
+  const locTotalBizExp = locHealth + locMalp + locDisab + locBiz;
+
+  let locSETax, locSETaxDeductible, loc401kEmployee, loc401kEmployer, loc401kTotal;
+  let locTaxableIncome, locFedTax, locStateTax, locFICA_total, locAddlMed;
+
+  const loc401kEE_capped = Math.min(loc401kEE_input, 23000);
+
+  if (useSCorp) {
+    const sal = Math.min(scorpSalary, locGross);
+    const scorpEmployerFICA = sal * 0.0765;
+    const scorpEmployeeFICA_SS = Math.min(sal, ssCap) * 0.062;
+    const scorpEmployeeFICA_Med = sal * 0.0145;
+    const scorpAddlMed = Math.max(0, sal - addlMedThresh) * 0.009;
+    locFICA_total = scorpEmployerFICA + scorpEmployeeFICA_SS + scorpEmployeeFICA_Med + scorpAddlMed;
+    locAddlMed = scorpAddlMed;
+
+    const corpProfit = locGross - locTotalBizExp - scorpEmployerFICA;
+    const distribution = Math.max(0, corpProfit - sal);
+
+    loc401kEmployee = loc401kEE_capped;
+    const maxER = Math.min(sal * 0.25, 69000 - loc401kEmployee);
+    loc401kEmployer = Math.min(loc401kER_input, Math.max(0, maxER));
+    loc401kTotal = loc401kEmployee + loc401kEmployer;
+
+    const locAGI = sal + distribution - loc401kEmployee - otherDed + spouseInc;
+    const locDed = Math.max(stdDeduction(status), itemized);
+    locTaxableIncome = Math.max(0, locAGI - locDed);
+    locFedTax = fedTax(locTaxableIncome, status);
+    locStateTax = locTaxableIncome * stateRate;
+    locSETax = locFICA_total;
+    locSETaxDeductible = scorpEmployerFICA;
+  } else {
+    const netEarnings = locGross - locTotalBizExp;
+    const seBase = netEarnings * 0.9235;
+    const seSS = Math.min(seBase, ssCap) * 0.124;
+    const seMed = seBase * 0.029;
+    locAddlMed = Math.max(0, seBase - addlMedThresh) * 0.009;
+    locSETax = seSS + seMed + locAddlMed;
+    locSETaxDeductible = (seSS + seMed) / 2;
+
+    loc401kEmployee = loc401kEE_capped;
+    const adjNet = netEarnings - locSETaxDeductible;
+    const maxER = Math.min(adjNet * 0.20, 69000 - loc401kEmployee);
+    loc401kEmployer = Math.min(loc401kER_input, Math.max(0, maxER));
+    loc401kTotal = loc401kEmployee + loc401kEmployer;
+
+    const locAGI = netEarnings - locSETaxDeductible - loc401kEmployee - otherDed + spouseInc;
+    const locDed = Math.max(stdDeduction(status), itemized);
+    locTaxableIncome = Math.max(0, locAGI - locDed);
+    locFedTax = fedTax(locTaxableIncome, status);
+    locStateTax = locTaxableIncome * stateRate;
+    locFICA_total = locSETax;
+  }
+
+  const locTotalTax = locFedTax + locStateTax + locSETax;
+  const locTakeHome = locGross - locTotalTax - locTotalBizExp - loc401kEmployee + locTravelReimb;
+  const locEffRate = locGross > 0 ? locTotalTax / locGross : 0;
+
+  // ===== RENDER =====
+  const diff = locTakeHome - w2TakeHome;
+  const diffPct = w2TakeHome !== 0 ? diff / w2TakeHome : 0;
+  const winner = diff >= 0 ? 'loc' : 'w2';
+
+  const seTaxSavings = useSCorp ? (() => {
+    const netE = locGross - locTotalBizExp;
+    const base = netE * 0.9235;
+    const noSCorpSE = Math.min(base, ssCap) * 0.124 + base * 0.029;
+    return noSCorpSE - locSETax;
+  })() : 0;
+
+  document.getElementById('summaryCards').innerHTML = `
+    <div class="sum-card w2">
+      <div class="label">W-2 Take-Home</div>
+      <div class="value">${fmt(w2TakeHome)}</div>
+      <div class="sub">${fmt(Math.round(w2TakeHome/12))}/mo · Eff. tax ${pct(w2EffRate)}</div>
+    </div>
+    <div class="sum-card loc">
+      <div class="label">Locum Take-Home</div>
+      <div class="value">${fmt(locTakeHome)}</div>
+      <div class="sub">${fmt(Math.round(locTakeHome/12))}/mo · Eff. tax ${pct(locEffRate)}</div>
+    </div>
+    <div class="sum-card diff">
+      <div class="label">Net Difference</div>
+      <div class="value" style="color:${diff >= 0 ? 'var(--accent-loc)' : 'var(--accent-red)'}">${diff >= 0 ? '+' : ''}${fmt(diff)}</div>
+      <div class="sub">${diff >= 0 ? '+' : ''}${(diffPct*100).toFixed(1)}% vs W-2</div>
+      <div class="winner-badge ${winner === 'w2' ? 'w2-wins' : 'loc-wins'}">${winner === 'w2' ? 'W-2 wins' : 'Locum wins'}</div>
+    </div>
+    <div class="sum-card w2">
+      <div class="label">W-2 Total Comp Value</div>
+      <div class="value">${fmt(w2TotalComp)}</div>
+      <div class="sub">incl. employer benefits + match</div>
+    </div>
+    <div class="sum-card loc">
+      <div class="label">Locum Gross + Reimbursements</div>
+      <div class="value">${fmt(locGross + locTravelReimb)}</div>
+      <div class="sub">${fmt(locGross)} taxable${locTravelReimb > 0 ? ' + ' + fmt(locTravelReimb) + ' reimb.' : ''}</div>
+    </div>
+    <div class="sum-card diff">
+      <div class="label">Tax Sheltered (401k)</div>
+      <div class="value" style="color:var(--accent-purple)">${fmt(Math.max(w2_401k_total, loc401kTotal))}</div>
+      <div class="sub">W-2: ${fmt(w2_401k_total)} · Locum: ${fmt(loc401kTotal)}</div>
+    </div>
+  `;
+
+  const maxBar = Math.max(w2Gross, locGross, w2TakeHome, locTakeHome, w2TotalComp, 1);
+  const bars = [
+    ['Gross Income', w2Gross, locGross],
+    ['Total Tax', w2TotalTax, locTotalTax],
+    ['Take-Home', w2TakeHome, locTakeHome],
+    ['401k Total Sheltered', w2_401k_total, loc401kTotal],
+  ];
+  document.getElementById('barsContainer').innerHTML = bars.map(([label, w2v, locv]) => `
+    <div style="margin-bottom:14px;">
+      <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px;">${label}</div>
+      <div class="bar-compare">
+        <div class="bar-label">W-2</div>
+        <div class="bar-track"><div class="bar-fill w2" style="width:${(w2v/maxBar*100).toFixed(1)}%">${fmt(w2v)}</div></div>
+      </div>
+      <div class="bar-compare">
+        <div class="bar-label">Locum</div>
+        <div class="bar-track"><div class="bar-fill loc" style="width:${(locv/maxBar*100).toFixed(1)}%">${fmt(locv)}</div></div>
+      </div>
+    </div>`).join('');
+
+  const rows = [
+    { section: 'Income' },
+    { label: 'Base Salary / Hourly Revenue', w2: w2Sal, loc: locHourlyGross },
+    { label: 'Overtime Pay', w2: w2Overtime, loc: 0 },
+    { label: 'Signing Bonus', w2: w2Bonus, loc: locSignOn },
+    { label: 'Relocation Bonus', w2: 0, loc: locRelocation },
+    { label: 'Travel Reimbursement (non-taxable)', w2: 0, loc: locTravelReimb, highlight: true },
+    { label: 'Taxable Gross Income', w2: w2Gross, loc: locGross, total: true },
+    { label: 'PTO Value (embedded in salary)', w2: w2PTOValue, loc: 0, note: true },
+    { label: 'Employer Benefits Value', w2: w2HealthEmpl + w2Malpractice + w2Disability + w2CME, loc: 0 },
+    { section: 'Pre-Tax Deductions & Expenses' },
+    { label: 'Business Expenses / Write-offs (total)', w2: 0, loc: -locTotalBizExp },
+    { label: '  ↳ Health Insurance', w2: -w2HealthPrem, loc: -locHealth },
+    { label: '  ↳ Malpractice / Tail', w2: 0, loc: -locMalp },
+    { label: '  ↳ Disability Insurance', w2: 0, loc: -locDisab },
+    { label: '  ↳ CME / Licensing / Home Office / Other', w2: 0, loc: -locBiz },
+    { section: 'Retirement Contributions' },
+    { label: 'Employee Deferral (you → your 401k)', w2: -w2_401k_employee, loc: -loc401kEmployee },
+    { label: 'Employer Match / Profit-Sharing (biz → your 401k)', w2: -w2_401k_match, loc: -loc401kEmployer },
+    { label: 'Total 401k Sheltered', w2: w2_401k_total, loc: loc401kTotal, total: true, highlight: true },
+    { section: 'Taxes' },
+    { label: 'Federal Income Tax', w2: -w2FedTax, loc: -locFedTax },
+    { label: 'State Income Tax (' + (stateRate * 100).toFixed(1) + '%)', w2: -w2StateTax, loc: -locStateTax },
+    { label: 'FICA / Self-Employment Tax', w2: -w2FICA, loc: -locFICA_total },
+    { label: '  ↳ Social Security (6.2% / 12.4%)', w2: -w2SS, loc: useSCorp ? -(Math.min(scorpSalary, ssCap) * 0.124) : -(Math.min((locGross - locTotalBizExp) * 0.9235, ssCap) * 0.124) },
+    { label: '  ↳ Medicare (1.45% / 2.9%)', w2: -w2Med, loc: useSCorp ? -(scorpSalary * 0.029) : -((locGross - locTotalBizExp) * 0.9235 * 0.029) },
+    { label: '  ↳ Additional Medicare (0.9%)', w2: -w2AddlMed, loc: -locAddlMed },
+    { label: 'Total Tax Burden', w2: -w2TotalTax, loc: -locTotalTax, total: true },
+    { label: 'Effective Tax Rate (tax ÷ gross)', w2: pct(w2EffRate), loc: pct(locEffRate), raw: true },
+    { section: 'Tax Optimization Summary' },
+    { label: 'S-Corp SE Tax Savings vs Sole Prop', w2: 0, loc: seTaxSavings, highlight: true },
+    { label: 'Est. Tax Savings from Write-offs', w2: 0, loc: locTotalBizExp * (locFedTax > 0 ? 0.24 : 0.22) + locTotalBizExp * stateRate, highlight: true },
+    { section: 'Bottom Line' },
+    { label: 'Annual Take-Home Pay', w2: w2TakeHome, loc: locTakeHome, total: true },
+    { label: 'Monthly Take-Home', w2: w2TakeHome / 12, loc: locTakeHome / 12, total: true },
+  ];
+
+  document.getElementById('breakdownBody').innerHTML = rows.map(r => {
+    if (r.section) return `<tr class="row-section"><td colspan="3">${r.section}</td></tr>`;
+    if (r.raw) return `<tr><td>${r.label}</td><td>${r.w2}</td><td>${r.loc}</td></tr>`;
+    const cls = r.total ? ' class="row-total"' : '';
+    const w2c = r.highlight && r.w2 > 0 ? ' class="positive"' : (r.w2 < 0 ? ' class="negative"' : '');
+    const lc = r.highlight && r.loc > 0 ? ' class="positive"' : (r.loc < 0 ? ' class="negative"' : '');
+    return `<tr${cls}><td>${r.label}</td><td${w2c}>${fmt(r.w2)}</td><td${lc}>${fmt(r.loc)}</td></tr>`;
+  }).join('');
+}
+
+recalc();
+</script>
+</body>
+</html>
