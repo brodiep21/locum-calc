@@ -53,6 +53,23 @@
     max-width: 640px;
     margin-inline: auto;
   }
+  .export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    padding: 8px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .export-btn:hover { border-color: var(--accent-w2); color: var(--text); }
   .container {
     max-width: 1280px;
     margin: 0 auto;
@@ -341,6 +358,54 @@
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* ===== PRINT / EXPORT STYLES ===== */
+  @media print {
+    @page { margin: 0.75in; size: letter; }
+    body { background: #fff !important; color: #111 !important; font-size: 11px; }
+    .export-btn { display: none !important; }
+    .page-header {
+      background: #fff !important;
+      border-bottom: 2px solid #ddd !important;
+      padding: 16px 0 12px !important;
+    }
+    .page-header h1 {
+      background: none !important;
+      -webkit-background-clip: unset !important;
+      -webkit-text-fill-color: #111 !important;
+      color: #111 !important;
+      font-size: 1.4rem !important;
+    }
+    .page-header p { color: #555 !important; }
+    .container { padding: 12px 0 !important; }
+    .inputs-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; page-break-inside: avoid; }
+    .card, .sum-card, .breakdown, .notes {
+      background: #fff !important;
+      border: 1px solid #ccc !important;
+      box-shadow: none !important;
+      break-inside: avoid;
+    }
+    .card h2, .notes h3 { color: #111 !important; }
+    .field label, .field input, .field select, .section-label,
+    .toggle-row label, .b-table td, .b-table th, .notes li { color: #333 !important; }
+    .field input, .field select {
+      background: #f9f9f9 !important;
+      border-color: #ccc !important;
+    }
+    .breakdown-title { background: #f4f4f4 !important; color: #111 !important; }
+    .b-table .row-section td { background: #f4f4f4 !important; color: #555 !important; }
+    .b-table .row-total td { background: #f0f0f0 !important; }
+    .sum-card .label { color: #555 !important; }
+    .sum-card .sub { color: #555 !important; }
+    .summary-cards { grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
+    .bar-track { background: #eee !important; }
+    .bar-fill.w2 { background: #58a6ff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .bar-fill.loc { background: #3fb950 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .sum-card::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .negative { color: #c0392b !important; }
+    .positive { color: #27ae60 !important; }
+    .toggle { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -348,6 +413,10 @@
 <div class="page-header">
   <h1>Locum Tenens vs W-2 Employment</h1>
   <p>Deep financial comparison including taxes, benefits, S-Corp savings, retirement sheltering, write-offs, and true take-home pay</p>
+  <button class="export-btn" onclick="window.print()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Export / Print PDF
+  </button>
 </div>
 
 <div class="container">
@@ -401,7 +470,7 @@
 
       <div class="section-label">Retirement</div>
       <div class="field">
-        <label>Your 401k Contribution <span class="hint">% of base salary, max $23k</span></label>
+        <label>Your 401k Contribution <span class="hint">% of base salary, max $23,500</span></label>
         <input type="text" id="w2401kPct" value="8" oninput="recalc()">
       </div>
       <div class="field">
@@ -464,15 +533,15 @@
 
       <div class="section-label">Retirement — Solo 401k</div>
       <div class="field">
-        <label>Employee Deferral <span class="hint">you → your 401k (max $23,000)</span></label>
-        <input type="text" id="loc401kEmployee" value="23,000" oninput="recalc()">
+        <label>Employee Deferral <span class="hint">you → your 401k (max $23,500)</span></label>
+        <input type="text" id="loc401kEmployee" value="23,500" oninput="recalc()">
       </div>
       <div class="field">
         <label>Employer Profit-Sharing <span class="hint">your biz → your 401k</span></label>
-        <input type="text" id="loc401kEmployer" value="45,000" oninput="recalc()">
+        <input type="text" id="loc401kEmployer" value="46,500" oninput="recalc()">
       </div>
       <div style="font-size:.72rem;color:var(--text2);margin-bottom:10px;opacity:.7;line-height:1.5;">
-        Combined cap: $69,000 (under 50) / $76,500 (50+) · Employee deferral hard-capped at $23,000 · Employer portion limited to 25% of S-Corp W-2 salary or ~20% of sole prop adjusted net
+        Combined cap: $70,000 (under 50) / $77,500 (50+) · Employee deferral hard-capped at $23,500 · Employer portion limited to 25% of S-Corp W-2 salary or ~20% of sole prop adjusted net
       </div>
 
       <div class="section-label">S-Corp Election</div>
@@ -534,16 +603,17 @@
   <div class="notes">
     <h3>Methodology & Key Assumptions</h3>
     <ul>
-      <li><strong>Federal Tax Brackets:</strong> Uses 2024 brackets (10%, 12%, 22%, 24%, 32%, 35%, 37%). Taxable income = AGI minus the greater of standard or itemized deductions.</li>
-      <li><strong>Self-Employment Tax:</strong> 15.3% on 92.35% of net SE income (Social Security on first $168,600, Medicare uncapped). The deductible half of SE tax is accounted for.</li>
+      <li><strong>Federal Tax Brackets:</strong> Uses 2025 brackets (10%, 12%, 22%, 24%, 32%, 35%, 37%). Taxable income = AGI minus the greater of standard or itemized deductions.</li>
+      <li><strong>2025 Standard Deductions:</strong> Single $15,000 · Married Filing Jointly $30,000 · Head of Household $22,500.</li>
+      <li><strong>Self-Employment Tax:</strong> 15.3% on 92.35% of net SE income (Social Security on first $176,100, Medicare uncapped). The deductible half of SE tax is accounted for.</li>
       <li><strong>S-Corp Savings:</strong> Only the "reasonable salary" owes FICA (7.65% employee + 7.65% employer). Distributions above salary avoid SE tax. The employer-side FICA is a deductible business expense.</li>
-      <li><strong>Solo 401k — Employee Deferral:</strong> This is money YOU put in, just like contributing to a regular 401k at a job. Hard-capped at $23,000/yr (under 50). Reduces your taxable income dollar for dollar.</li>
-      <li><strong>Solo 401k — Employer Profit-Sharing:</strong> Since you own the business, your business can ALSO contribute on top of the employee deferral. Limited to 25% of your S-Corp W-2 salary, or ~20% of sole prop adjusted net. Combined with employee deferral, the total cap is $69,000 ($76,500 if 50+).</li>
-      <li><strong>W-2 401k:</strong> Your chosen contribution % applied to base salary (capped at $23k), plus employer match. Overtime and bonuses not included in 401k calculation.</li>
+      <li><strong>Solo 401k — Employee Deferral:</strong> This is money YOU put in, just like contributing to a regular 401k at a job. Hard-capped at $23,500/yr (under 50). Reduces your taxable income dollar for dollar.</li>
+      <li><strong>Solo 401k — Employer Profit-Sharing:</strong> Since you own the business, your business can ALSO contribute on top of the employee deferral. Limited to 25% of your S-Corp W-2 salary, or ~20% of sole prop adjusted net. Combined with employee deferral, the total cap is $70,000 ($77,500 if 50+).</li>
+      <li><strong>W-2 401k:</strong> Your chosen contribution % applied to base salary (capped at $23,500), plus employer match. Overtime and bonuses not included in 401k calculation.</li>
       <li><strong>Overtime Pay (W-2):</strong> Added to gross income, subject to all taxes. Not included in 401k contribution base (most employer plans use base salary only).</li>
       <li><strong>Travel Reimbursement (Locum):</strong> Treated as accountable plan reimbursement — non-taxable, not included in gross income. Directly increases your take-home without tax impact.</li>
       <li><strong>Sign-On / Relocation Bonuses (Locum):</strong> Treated as taxable income added to gross revenue.</li>
-      <li><strong>QBI Deduction:</strong> Not modeled (phases out above $383,900 MFJ for specified service trades like medicine).</li>
+      <li><strong>QBI Deduction:</strong> Not modeled (phases out above $394,600 MFJ for specified service trades like medicine).</li>
       <li><strong>Additional Medicare Tax:</strong> 0.9% on earnings above $200k (single) / $250k (MFJ).</li>
       <li><strong>PTO Value:</strong> W-2 PTO valued at daily rate (salary ÷ 260 working days). Locum unpaid days off reduce gross income instead.</li>
       <li><strong>Write-offs (Locum):</strong> Business expenses deducted before SE tax and income tax. Includes health, malpractice, disability, travel, lodging, licensing, CME, home office, phone, equipment.</li>
@@ -557,11 +627,12 @@ function pn(v) { return parseFloat(String(v).replace(/[^0-9.\-]/g, '')) || 0; }
 function fmt(n) { return n < 0 ? '-$' + Math.abs(Math.round(n)).toLocaleString() : '$' + Math.round(n).toLocaleString(); }
 function pct(n) { return (n * 100).toFixed(1) + '%'; }
 
+// 2025 federal tax brackets
 function fedTax(taxable, status) {
   const brackets = {
-    single:  [[11600,.10],[47150,.12],[100525,.22],[191950,.24],[243725,.32],[609350,.35],[Infinity,.37]],
-    mfj:     [[23200,.10],[94300,.12],[201050,.22],[383900,.24],[487450,.32],[731200,.35],[Infinity,.37]],
-    hoh:     [[16550,.10],[63100,.12],[100500,.22],[191950,.24],[243700,.32],[609350,.35],[Infinity,.37]],
+    single: [[11925,.10],[48475,.12],[103350,.22],[197300,.24],[250525,.32],[626350,.35],[Infinity,.37]],
+    mfj:    [[23850,.10],[96950,.12],[206700,.22],[394600,.24],[501050,.32],[751600,.35],[Infinity,.37]],
+    hoh:    [[17000,.10],[64850,.12],[103350,.22],[197300,.24],[250500,.32],[626350,.35],[Infinity,.37]],
   };
   let b = brackets[status] || brackets.single;
   let tax = 0, prev = 0;
@@ -575,142 +646,157 @@ function fedTax(taxable, status) {
   return Math.max(tax, 0);
 }
 
+// 2025 standard deductions
 function stdDeduction(status) {
-  return { single: 14600, mfj: 29200, hoh: 21900 }[status] || 14600;
+  return { single: 15000, mfj: 30000, hoh: 22500 }[status] || 15000;
 }
 
 function recalc() {
-  const w2Sal = pn(document.getElementById('w2Salary').value);
-  const w2Overtime = pn(document.getElementById('w2Overtime').value);
-  const w2MatchPct = pn(document.getElementById('w2Match').value) / 100;
+  const w2Sal        = pn(document.getElementById('w2Salary').value);
+  const w2Overtime   = pn(document.getElementById('w2Overtime').value);
+  const w2MatchPct   = pn(document.getElementById('w2Match').value) / 100;
   const w2HealthPrem = pn(document.getElementById('w2HealthPrem').value);
   const w2HealthEmpl = pn(document.getElementById('w2HealthEmpl').value);
-  const w2CME = pn(document.getElementById('w2CME').value);
-  const w2Bonus = pn(document.getElementById('w2Bonus').value);
+  const w2CME        = pn(document.getElementById('w2CME').value);
+  const w2Bonus      = pn(document.getElementById('w2Bonus').value);
   const w2Malpractice = pn(document.getElementById('w2Malpractice').value);
   const w2Disability = pn(document.getElementById('w2Disability').value);
-  const w2PTO = pn(document.getElementById('w2PTO').value);
-  const w2401kPct = pn(document.getElementById('w2401kPct').value) / 100;
+  const w2PTO        = pn(document.getElementById('w2PTO').value);
+  const w2401kPct    = pn(document.getElementById('w2401kPct').value) / 100;
 
-  const locRate = pn(document.getElementById('locRate').value);
-  const locHours = pn(document.getElementById('locHours').value);
-  const locWeeks = pn(document.getElementById('locWeeks').value);
-  const locSignOn = pn(document.getElementById('locSignOn').value);
+  const locRate      = pn(document.getElementById('locRate').value);
+  const locHours     = pn(document.getElementById('locHours').value);
+  const locWeeks     = pn(document.getElementById('locWeeks').value);
+  const locSignOn    = pn(document.getElementById('locSignOn').value);
   const locRelocation = pn(document.getElementById('locRelocation').value);
   const locTravelReimb = pn(document.getElementById('locTravelReimb').value);
-  const locHealth = pn(document.getElementById('locHealth').value);
-  const locMalp = pn(document.getElementById('locMalpractice').value);
-  const locDisab = pn(document.getElementById('locDisability').value);
-  const locBiz = pn(document.getElementById('locBizExp').value);
+  const locHealth    = pn(document.getElementById('locHealth').value);
+  const locMalp      = pn(document.getElementById('locMalpractice').value);
+  const locDisab     = pn(document.getElementById('locDisability').value);
+  const locBiz       = pn(document.getElementById('locBizExp').value);
   const loc401kEE_input = pn(document.getElementById('loc401kEmployee').value);
   const loc401kER_input = pn(document.getElementById('loc401kEmployer').value);
-  const useSCorp = document.getElementById('locSCorp').checked;
-  const scorpSalary = pn(document.getElementById('locSCorpSalary').value);
+  const useSCorp     = document.getElementById('locSCorp').checked;
+  const scorpSalary  = pn(document.getElementById('locSCorpSalary').value);
 
-  const status = document.getElementById('filingStatus').value;
+  const status    = document.getElementById('filingStatus').value;
   const spouseInc = pn(document.getElementById('spouseIncome').value);
   const stateRate = pn(document.getElementById('stateRate').value) / 100;
-  const itemized = pn(document.getElementById('itemized').value);
-  const otherDed = pn(document.getElementById('otherDed').value);
+  const itemized  = pn(document.getElementById('itemized').value);
+  const otherDed  = pn(document.getElementById('otherDed').value);
 
   document.getElementById('salaryField').style.display = useSCorp ? 'block' : 'none';
 
-  const ssCap = 168600;
+  // 2025 constants
+  const ssCap = 176100;
+  const ee401kCap = 23500;
+  const combined401kCap = 70000;
   const addlMedThresh = status === 'mfj' ? 250000 : 200000;
 
   // ===== W-2 CALCULATIONS =====
   const w2Gross = w2Sal + w2Overtime + w2Bonus;
-  const w2_401k_employee = Math.min(w2Sal * w2401kPct, 23000);
-  const w2_401k_match = Math.min(w2Sal * w2MatchPct, 23000);
-  const w2_401k_total = w2_401k_employee + w2_401k_match;
+  const w2_401k_employee = Math.min(w2Sal * w2401kPct, ee401kCap);
+  const w2_401k_match    = Math.min(w2Sal * w2MatchPct, ee401kCap);
+  const w2_401k_total    = w2_401k_employee + w2_401k_match;
 
-  const w2SS = Math.min(w2Gross, ssCap) * 0.062;
-  const w2Med = w2Gross * 0.0145;
+  const w2SS      = Math.min(w2Gross, ssCap) * 0.062;
+  const w2Med     = w2Gross * 0.0145;
   const w2AddlMed = Math.max(0, w2Gross - addlMedThresh) * 0.009;
-  const w2FICA = w2SS + w2Med + w2AddlMed;
+  const w2FICA    = w2SS + w2Med + w2AddlMed;
 
-  const w2AGI = w2Gross - w2_401k_employee - otherDed + spouseInc;
+  const w2AGI      = w2Gross - w2_401k_employee - otherDed + spouseInc;
   const w2Deduction = Math.max(stdDeduction(status), itemized);
-  const w2Taxable = Math.max(0, w2AGI - w2Deduction);
-  const w2FedTax = fedTax(w2Taxable, status);
+  const w2Taxable  = Math.max(0, w2AGI - w2Deduction);
+  const w2FedTax   = fedTax(w2Taxable, status);
   const w2StateTax = w2Taxable * stateRate;
 
-  const w2TotalTax = w2FedTax + w2StateTax + w2FICA;
-  const w2TakeHome = w2Gross - w2TotalTax - w2_401k_employee - w2HealthPrem;
-
+  const w2TotalTax  = w2FedTax + w2StateTax + w2FICA;
+  const w2TakeHome  = w2Gross - w2TotalTax - w2_401k_employee - w2HealthPrem;
   const w2TotalComp = w2Gross + w2HealthEmpl + w2Malpractice + w2Disability + w2CME + w2_401k_match;
-  const w2EffRate = w2Gross > 0 ? w2TotalTax / w2Gross : 0;
-  const w2PTOValue = (w2Sal / 260) * w2PTO;
+  const w2EffRate   = w2Gross > 0 ? w2TotalTax / w2Gross : 0;
+  const w2PTOValue  = (w2Sal / 260) * w2PTO;
 
   // ===== LOCUM CALCULATIONS =====
   const locHourlyGross = locRate * locHours * locWeeks;
-  const locGross = locHourlyGross + locSignOn + locRelocation;
+  const locGross       = locHourlyGross + locSignOn + locRelocation;
   const locTotalBizExp = locHealth + locMalp + locDisab + locBiz;
+  const loc401kEE_capped = Math.min(loc401kEE_input, ee401kCap);
 
+  // Variables for breakdown rows (computed precisely in each branch)
   let locSETax, locSETaxDeductible, loc401kEmployee, loc401kEmployer, loc401kTotal;
   let locTaxableIncome, locFedTax, locStateTax, locFICA_total, locAddlMed;
-
-  const loc401kEE_capped = Math.min(loc401kEE_input, 23000);
+  let locSS_total, locMed_total; // for breakdown rows
 
   if (useSCorp) {
     const sal = Math.min(scorpSalary, locGross);
-    const scorpEmployerFICA = sal * 0.0765;
-    const scorpEmployeeFICA_SS = Math.min(sal, ssCap) * 0.062;
-    const scorpEmployeeFICA_Med = sal * 0.0145;
-    const scorpAddlMed = Math.max(0, sal - addlMedThresh) * 0.009;
-    locFICA_total = scorpEmployerFICA + scorpEmployeeFICA_SS + scorpEmployeeFICA_Med + scorpAddlMed;
-    locAddlMed = scorpAddlMed;
 
-    const corpProfit = locGross - locTotalBizExp - scorpEmployerFICA;
+    // Employer FICA (deductible business expense)
+    const scorpEmployerSS  = Math.min(sal, ssCap) * 0.062;
+    const scorpEmployerMed = sal * 0.0145;
+    const scorpEmployerFICA = scorpEmployerSS + scorpEmployerMed;
+
+    // Employee FICA
+    const scorpEmployeeSS  = Math.min(sal, ssCap) * 0.062;
+    const scorpEmployeeMed = sal * 0.0145;
+    locAddlMed = Math.max(0, sal - addlMedThresh) * 0.009;
+
+    locSS_total  = scorpEmployerSS + scorpEmployeeSS;
+    locMed_total = scorpEmployerMed + scorpEmployeeMed;
+    locFICA_total = locSS_total + locMed_total + locAddlMed;
+
+    const corpProfit   = locGross - locTotalBizExp - scorpEmployerFICA;
     const distribution = Math.max(0, corpProfit - sal);
 
     loc401kEmployee = loc401kEE_capped;
-    const maxER = Math.min(sal * 0.25, 69000 - loc401kEmployee);
+    const maxER     = Math.min(sal * 0.25, combined401kCap - loc401kEmployee);
     loc401kEmployer = Math.min(loc401kER_input, Math.max(0, maxER));
-    loc401kTotal = loc401kEmployee + loc401kEmployer;
+    loc401kTotal    = loc401kEmployee + loc401kEmployer;
 
     const locAGI = sal + distribution - loc401kEmployee - otherDed + spouseInc;
     const locDed = Math.max(stdDeduction(status), itemized);
     locTaxableIncome = Math.max(0, locAGI - locDed);
-    locFedTax = fedTax(locTaxableIncome, status);
+    locFedTax   = fedTax(locTaxableIncome, status);
     locStateTax = locTaxableIncome * stateRate;
-    locSETax = locFICA_total;
+    locSETax    = locFICA_total;
     locSETaxDeductible = scorpEmployerFICA;
   } else {
     const netEarnings = locGross - locTotalBizExp;
-    const seBase = netEarnings * 0.9235;
-    const seSS = Math.min(seBase, ssCap) * 0.124;
-    const seMed = seBase * 0.029;
+    const seBase      = netEarnings * 0.9235;
+    const seSS        = Math.min(seBase, ssCap) * 0.124;
+    const seMed       = seBase * 0.029;
     locAddlMed = Math.max(0, seBase - addlMedThresh) * 0.009;
-    locSETax = seSS + seMed + locAddlMed;
+    locSETax   = seSS + seMed + locAddlMed;
     locSETaxDeductible = (seSS + seMed) / 2;
 
+    locSS_total  = seSS;
+    locMed_total = seMed;
+    locFICA_total = locSETax;
+
     loc401kEmployee = loc401kEE_capped;
-    const adjNet = netEarnings - locSETaxDeductible;
-    const maxER = Math.min(adjNet * 0.20, 69000 - loc401kEmployee);
+    const adjNet    = netEarnings - locSETaxDeductible;
+    const maxER     = Math.min(adjNet * 0.20, combined401kCap - loc401kEmployee);
     loc401kEmployer = Math.min(loc401kER_input, Math.max(0, maxER));
-    loc401kTotal = loc401kEmployee + loc401kEmployer;
+    loc401kTotal    = loc401kEmployee + loc401kEmployer;
 
     const locAGI = netEarnings - locSETaxDeductible - loc401kEmployee - otherDed + spouseInc;
     const locDed = Math.max(stdDeduction(status), itemized);
     locTaxableIncome = Math.max(0, locAGI - locDed);
-    locFedTax = fedTax(locTaxableIncome, status);
+    locFedTax   = fedTax(locTaxableIncome, status);
     locStateTax = locTaxableIncome * stateRate;
-    locFICA_total = locSETax;
   }
 
   const locTotalTax = locFedTax + locStateTax + locSETax;
   const locTakeHome = locGross - locTotalTax - locTotalBizExp - loc401kEmployee + locTravelReimb;
-  const locEffRate = locGross > 0 ? locTotalTax / locGross : 0;
+  const locEffRate  = locGross > 0 ? locTotalTax / locGross : 0;
 
   // ===== RENDER =====
-  const diff = locTakeHome - w2TakeHome;
+  const diff    = locTakeHome - w2TakeHome;
   const diffPct = w2TakeHome !== 0 ? diff / w2TakeHome : 0;
-  const winner = diff >= 0 ? 'loc' : 'w2';
+  const winner  = diff >= 0 ? 'loc' : 'w2';
 
   const seTaxSavings = useSCorp ? (() => {
-    const netE = locGross - locTotalBizExp;
-    const base = netE * 0.9235;
+    const netE  = locGross - locTotalBizExp;
+    const base  = netE * 0.9235;
     const noSCorpSE = Math.min(base, ssCap) * 0.124 + base * 0.029;
     return noSCorpSE - locSETax;
   })() : 0;
@@ -793,8 +879,8 @@ function recalc() {
     { label: 'Federal Income Tax', w2: -w2FedTax, loc: -locFedTax },
     { label: 'State Income Tax (' + (stateRate * 100).toFixed(1) + '%)', w2: -w2StateTax, loc: -locStateTax },
     { label: 'FICA / Self-Employment Tax', w2: -w2FICA, loc: -locFICA_total },
-    { label: '  ↳ Social Security (6.2% / 12.4%)', w2: -w2SS, loc: useSCorp ? -(Math.min(scorpSalary, ssCap) * 0.124) : -(Math.min((locGross - locTotalBizExp) * 0.9235, ssCap) * 0.124) },
-    { label: '  ↳ Medicare (1.45% / 2.9%)', w2: -w2Med, loc: useSCorp ? -(scorpSalary * 0.029) : -((locGross - locTotalBizExp) * 0.9235 * 0.029) },
+    { label: '  ↳ Social Security (6.2% / 12.4%)', w2: -w2SS, loc: -locSS_total },
+    { label: '  ↳ Medicare (1.45% / 2.9%)', w2: -w2Med, loc: -locMed_total },
     { label: '  ↳ Additional Medicare (0.9%)', w2: -w2AddlMed, loc: -locAddlMed },
     { label: 'Total Tax Burden', w2: -w2TotalTax, loc: -locTotalTax, total: true },
     { label: 'Effective Tax Rate (tax ÷ gross)', w2: pct(w2EffRate), loc: pct(locEffRate), raw: true },
@@ -809,9 +895,9 @@ function recalc() {
   document.getElementById('breakdownBody').innerHTML = rows.map(r => {
     if (r.section) return `<tr class="row-section"><td colspan="3">${r.section}</td></tr>`;
     if (r.raw) return `<tr><td>${r.label}</td><td>${r.w2}</td><td>${r.loc}</td></tr>`;
-    const cls = r.total ? ' class="row-total"' : '';
-    const w2c = r.highlight && r.w2 > 0 ? ' class="positive"' : (r.w2 < 0 ? ' class="negative"' : '');
-    const lc = r.highlight && r.loc > 0 ? ' class="positive"' : (r.loc < 0 ? ' class="negative"' : '');
+    const cls  = r.total ? ' class="row-total"' : '';
+    const w2c  = r.highlight && r.w2 > 0 ? ' class="positive"' : (r.w2 < 0 ? ' class="negative"' : '');
+    const lc   = r.highlight && r.loc > 0 ? ' class="positive"' : (r.loc < 0 ? ' class="negative"' : '');
     return `<tr${cls}><td>${r.label}</td><td${w2c}>${fmt(r.w2)}</td><td${lc}>${fmt(r.loc)}</td></tr>`;
   }).join('');
 }
