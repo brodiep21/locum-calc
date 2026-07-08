@@ -539,6 +539,7 @@
       <div class="field">
         <label>Employer Profit-Sharing <span class="hint">your biz → your 401k</span></label>
         <input type="text" id="loc401kEmployer" value="46,500" oninput="recalc()">
+        <div id="erCapNote" style="font-size:.72rem;color:var(--text2);margin-top:4px;opacity:.85;"></div>
       </div>
       <div style="font-size:.72rem;color:var(--text2);margin-bottom:10px;opacity:.7;line-height:1.5;">
         Combined cap: $70,000 (under 50) / $77,500 (50+) · Employee deferral hard-capped at $23,500 · Employer portion limited to 25% of S-Corp W-2 salary or ~20% of sole prop adjusted net
@@ -608,7 +609,9 @@
       <li><strong>Self-Employment Tax:</strong> 15.3% on 92.35% of net SE income (Social Security on first $176,100, Medicare uncapped). The deductible half of SE tax is accounted for.</li>
       <li><strong>S-Corp Savings:</strong> Only the "reasonable salary" owes FICA (7.65% employee + 7.65% employer). Distributions above salary avoid SE tax. The employer-side FICA is a deductible business expense.</li>
       <li><strong>Solo 401k — Employee Deferral:</strong> This is money YOU put in, just like contributing to a regular 401k at a job. Hard-capped at $23,500/yr (under 50). Reduces your taxable income dollar for dollar.</li>
-      <li><strong>Solo 401k — Employer Profit-Sharing:</strong> Since you own the business, your business can ALSO contribute on top of the employee deferral. Limited to 25% of your S-Corp W-2 salary, or ~20% of sole prop adjusted net. Combined with employee deferral, the total cap is $70,000 ($77,500 if 50+).</li>
+      <li><strong>Solo 401k — Employer Profit-Sharing:</strong> Since you own the business, your business can ALSO contribute on top of the employee deferral. Limited to 25% of your S-Corp W-2 salary, or ~20% of sole prop adjusted net. Combined with employee deferral, the total cap is $70,000 ($77,500 if 50+). The field auto-caps to the allowed amount and shows the max under the input.</li>
+      <li><strong>Profit-Sharing reduces distribution &amp; take-home:</strong> The employer contribution is a deductible business expense — it lowers your S-Corp K-1 distribution (and taxable pass-through income) and, since it's money locked into retirement, it reduces spendable take-home. Raising it shifts dollars from taxable cash into tax-sheltered savings.</li>
+      <li><strong>Take-Home definition:</strong> Spendable cash only = taxable gross − all taxes − self-funded expenses − ALL retirement contributions (employee + employer) + non-taxable reimbursements. Retirement wealth is reported separately in the Bottom Line.</li>
       <li><strong>W-2 401k:</strong> Your chosen contribution % applied to base salary (capped at $23,500), plus employer match. Overtime and bonuses not included in 401k calculation.</li>
       <li><strong>Overtime Pay (W-2):</strong> Added to gross income, subject to all taxes. Not included in 401k contribution base (most employer plans use base salary only).</li>
       <li><strong>Travel Reimbursement (Locum):</strong> Treated as accountable plan reimbursement — non-taxable, not included in gross income. Directly increases your take-home without tax impact.</li>
@@ -726,6 +729,8 @@ function recalc() {
   let locSETax, locSETaxDeductible, loc401kEmployee, loc401kEmployer, loc401kTotal;
   let locTaxableIncome, locFedTax, locStateTax, locFICA_total, locAddlMed;
   let locSS_total, locMed_total; // for breakdown rows
+  let scorpSalaryUsed = 0, scorpEmployerFICA_out = 0, scorpDistribution = 0, corpNetProfit = 0;
+  let loc401kER_max = 0; // max allowed employer contribution this year
 
   if (useSCorp) {
     const sal = Math.min(scorpSalary, locGross);
@@ -744,21 +749,33 @@ function recalc() {
     locMed_total = scorpEmployerMed + scorpEmployeeMed;
     locFICA_total = locSS_total + locMed_total + locAddlMed;
 
-    const corpProfit   = locGross - locTotalBizExp - scorpEmployerFICA;
-    const distribution = Math.max(0, corpProfit - sal);
-
+    // Solo 401k: employee deferral comes out of W-2 wages; employer
+    // profit-sharing is a deductible business expense capped at 25% of the
+    // W-2 salary (and by the combined annual cap).
     loc401kEmployee = loc401kEE_capped;
-    const maxER     = Math.min(sal * 0.25, combined401kCap - loc401kEmployee);
-    loc401kEmployer = Math.min(loc401kER_input, Math.max(0, maxER));
+    loc401kER_max   = Math.max(0, Math.min(sal * 0.25, combined401kCap - loc401kEmployee));
+    loc401kEmployer = Math.min(loc401kER_input, loc401kER_max);
     loc401kTotal    = loc401kEmployee + loc401kEmployer;
 
-    const locAGI = sal + distribution - loc401kEmployee - otherDed + spouseInc;
+    // Corporate profit after EVERY deductible outflow. The employer 401k
+    // profit-sharing contribution reduces the K-1 distribution (and therefore
+    // the taxable pass-through income) — this is what makes the profit-sharing
+    // input actually move the numbers.
+    corpNetProfit      = locGross - locTotalBizExp - scorpEmployerFICA - sal - loc401kEmployer;
+    const distribution = Math.max(0, corpNetProfit);
+
+    // Personal AGI: W-2 wages (less pre-tax employee deferral) + K-1 distribution.
+    const locAGI = (sal - loc401kEmployee) + distribution - otherDed + spouseInc;
     const locDed = Math.max(stdDeduction(status), itemized);
     locTaxableIncome = Math.max(0, locAGI - locDed);
     locFedTax   = fedTax(locTaxableIncome, status);
     locStateTax = locTaxableIncome * stateRate;
     locSETax    = locFICA_total;
     locSETaxDeductible = scorpEmployerFICA;
+
+    scorpSalaryUsed       = sal;
+    scorpEmployerFICA_out = scorpEmployerFICA;
+    scorpDistribution     = distribution;
   } else {
     const netEarnings = locGross - locTotalBizExp;
     const seBase      = netEarnings * 0.9235;
@@ -774,11 +791,13 @@ function recalc() {
 
     loc401kEmployee = loc401kEE_capped;
     const adjNet    = netEarnings - locSETaxDeductible;
-    const maxER     = Math.min(adjNet * 0.20, combined401kCap - loc401kEmployee);
-    loc401kEmployer = Math.min(loc401kER_input, Math.max(0, maxER));
+    loc401kER_max   = Math.max(0, Math.min(adjNet * 0.20, combined401kCap - loc401kEmployee));
+    loc401kEmployer = Math.min(loc401kER_input, loc401kER_max);
     loc401kTotal    = loc401kEmployee + loc401kEmployer;
 
-    const locAGI = netEarnings - locSETaxDeductible - loc401kEmployee - otherDed + spouseInc;
+    // Both employee deferral and employer contribution to the solo 401k are
+    // deductible (adjustments to income), reducing taxable income.
+    const locAGI = netEarnings - locSETaxDeductible - loc401kTotal - otherDed + spouseInc;
     const locDed = Math.max(stdDeduction(status), itemized);
     locTaxableIncome = Math.max(0, locAGI - locDed);
     locFedTax   = fedTax(locTaxableIncome, status);
@@ -786,7 +805,10 @@ function recalc() {
   }
 
   const locTotalTax = locFedTax + locStateTax + locSETax;
-  const locTakeHome = locGross - locTotalTax - locTotalBizExp - loc401kEmployee + locTravelReimb;
+  // Take-home = spendable cash: gross, less taxes, less self-funded expenses,
+  // less ALL money locked into retirement (employee + employer), plus tax-free
+  // reimbursements.
+  const locTakeHome = locGross - locTotalTax - locTotalBizExp - loc401kTotal + locTravelReimb;
   const locEffRate  = locGross > 0 ? locTotalTax / locGross : 0;
 
   // ===== RENDER =====
@@ -833,7 +855,17 @@ function recalc() {
       <div class="value" style="color:var(--accent-purple)">${fmt(Math.max(w2_401k_total, loc401kTotal))}</div>
       <div class="sub">W-2: ${fmt(w2_401k_total)} · Locum: ${fmt(loc401kTotal)}</div>
     </div>
-  `;
+  ` + (useSCorp ? `
+    <div class="sum-card loc">
+      <div class="label">Locum S-Corp Distribution</div>
+      <div class="value">${fmt(scorpDistribution)}</div>
+      <div class="sub">K-1 pass-through, no FICA · after ${fmt(scorpSalaryUsed)} salary + ${fmt(loc401kEmployer)} 401k</div>
+    </div>` : '') + `
+    <div class="sum-card diff">
+      <div class="label">Monthly Take-Home Difference</div>
+      <div class="value" style="color:${diff >= 0 ? 'var(--accent-loc)' : 'var(--accent-red)'}">${diff >= 0 ? '+' : ''}${fmt(diff/12)}/mo</div>
+      <div class="sub">W-2 ${fmt(w2TakeHome/12)}/mo · Locum ${fmt(locTakeHome/12)}/mo</div>
+    </div>`;
 
   const maxBar = Math.max(w2Gross, locGross, w2TakeHome, locTakeHome, w2TotalComp, 1);
   const bars = [
@@ -841,6 +873,7 @@ function recalc() {
     ['Total Tax', w2TotalTax, locTotalTax],
     ['Take-Home', w2TakeHome, locTakeHome],
     ['401k Total Sheltered', w2_401k_total, loc401kTotal],
+    ['Retirement + Take-Home', w2TakeHome + w2_401k_total, locTakeHome + loc401kTotal],
   ];
   document.getElementById('barsContainer').innerHTML = bars.map(([label, w2v, locv]) => `
     <div style="margin-bottom:14px;">
@@ -855,22 +888,40 @@ function recalc() {
       </div>
     </div>`).join('');
 
+  const wOfDed = locFedTax > 0 ? 0.24 : 0.22; // rough marginal bracket for write-off savings
   const rows = [
     { section: 'Income' },
     { label: 'Base Salary / Hourly Revenue', w2: w2Sal, loc: locHourlyGross },
-    { label: 'Overtime Pay', w2: w2Overtime, loc: 0 },
+    { label: 'Overtime Pay', w2: w2Overtime, loc: null },
     { label: 'Signing Bonus', w2: w2Bonus, loc: locSignOn },
-    { label: 'Relocation Bonus', w2: 0, loc: locRelocation },
-    { label: 'Travel Reimbursement (non-taxable)', w2: 0, loc: locTravelReimb, highlight: true },
+    { label: 'Relocation Bonus', w2: null, loc: locRelocation },
+    { label: 'Travel Reimbursement (non-taxable)', w2: null, loc: locTravelReimb, highlight: true },
     { label: 'Taxable Gross Income', w2: w2Gross, loc: locGross, total: true },
-    { label: 'PTO Value (embedded in salary)', w2: w2PTOValue, loc: 0, note: true },
-    { label: 'Employer Benefits Value', w2: w2HealthEmpl + w2Malpractice + w2Disability + w2CME, loc: 0 },
-    { section: 'Pre-Tax Deductions & Expenses' },
-    { label: 'Business Expenses / Write-offs (total)', w2: 0, loc: -locTotalBizExp },
+    { label: 'PTO Value (embedded in salary)', w2: w2PTOValue, loc: null },
+    { label: 'Employer Benefits Value', w2: w2HealthEmpl + w2Malpractice + w2Disability + w2CME, loc: null },
+  ];
+
+  if (useSCorp) {
+    rows.push(
+      { section: 'S-Corp Cash Flow — how the business money splits' },
+      { label: 'Business Revenue', w2: null, loc: locGross },
+      { label: ' (−) Business Expenses / Write-offs', w2: null, loc: -locTotalBizExp },
+      { label: ' (−) Employer Payroll Tax (FICA)', w2: null, loc: -scorpEmployerFICA_out },
+      { label: ' (−) W-2 Salary Paid to You', w2: null, loc: -scorpSalaryUsed },
+      { label: ' (−) Employer 401k Profit-Sharing', w2: null, loc: -loc401kEmployer },
+      { label: ' (=) Net Distribution (K-1, no FICA)', w2: null, loc: scorpDistribution, total: true, highlight: true },
+    );
+  }
+
+  rows.push({ section: 'Pre-Tax Deductions & Expenses' });
+  if (!useSCorp) {
+    rows.push({ label: 'Business Expenses / Write-offs (total)', w2: null, loc: -locTotalBizExp });
+  }
+  rows.push(
     { label: '  ↳ Health Insurance', w2: -w2HealthPrem, loc: -locHealth },
-    { label: '  ↳ Malpractice / Tail', w2: 0, loc: -locMalp },
-    { label: '  ↳ Disability Insurance', w2: 0, loc: -locDisab },
-    { label: '  ↳ CME / Licensing / Home Office / Other', w2: 0, loc: -locBiz },
+    { label: '  ↳ Malpractice / Tail', w2: null, loc: -locMalp },
+    { label: '  ↳ Disability Insurance', w2: null, loc: -locDisab },
+    { label: '  ↳ CME / Licensing / Home Office / Other', w2: null, loc: -locBiz },
     { section: 'Retirement Contributions' },
     { label: 'Employee Deferral (you → your 401k)', w2: -w2_401k_employee, loc: -loc401kEmployee },
     { label: 'Employer Match / Profit-Sharing (biz → your 401k)', w2: -w2_401k_match, loc: -loc401kEmployer },
@@ -879,27 +930,40 @@ function recalc() {
     { label: 'Federal Income Tax', w2: -w2FedTax, loc: -locFedTax },
     { label: 'State Income Tax (' + (stateRate * 100).toFixed(1) + '%)', w2: -w2StateTax, loc: -locStateTax },
     { label: 'FICA / Self-Employment Tax', w2: -w2FICA, loc: -locFICA_total },
-    { label: '  ↳ Social Security (6.2% / 12.4%)', w2: -w2SS, loc: -locSS_total },
-    { label: '  ↳ Medicare (1.45% / 2.9%)', w2: -w2Med, loc: -locMed_total },
+    { label: '  ↳ Social Security', w2: -w2SS, loc: -locSS_total },
+    { label: '  ↳ Medicare', w2: -w2Med, loc: -locMed_total },
     { label: '  ↳ Additional Medicare (0.9%)', w2: -w2AddlMed, loc: -locAddlMed },
     { label: 'Total Tax Burden', w2: -w2TotalTax, loc: -locTotalTax, total: true },
     { label: 'Effective Tax Rate (tax ÷ gross)', w2: pct(w2EffRate), loc: pct(locEffRate), raw: true },
     { section: 'Tax Optimization Summary' },
-    { label: 'S-Corp SE Tax Savings vs Sole Prop', w2: 0, loc: seTaxSavings, highlight: true },
-    { label: 'Est. Tax Savings from Write-offs', w2: 0, loc: locTotalBizExp * (locFedTax > 0 ? 0.24 : 0.22) + locTotalBizExp * stateRate, highlight: true },
+    { label: 'S-Corp SE Tax Savings vs Sole Prop', w2: null, loc: seTaxSavings, highlight: true },
+    { label: 'Est. Income-Tax Savings from Write-offs', w2: null, loc: locTotalBizExp * wOfDed + locTotalBizExp * stateRate, highlight: true },
     { section: 'Bottom Line' },
-    { label: 'Annual Take-Home Pay', w2: w2TakeHome, loc: locTakeHome, total: true },
+    { label: 'Annual Take-Home Pay (spendable cash)', w2: w2TakeHome, loc: locTakeHome, total: true },
     { label: 'Monthly Take-Home', w2: w2TakeHome / 12, loc: locTakeHome / 12, total: true },
-  ];
+    { label: 'Weekly Take-Home', w2: w2TakeHome / 52, loc: locTakeHome / 52 },
+    { label: 'Retirement Saved This Year', w2: w2_401k_total, loc: loc401kTotal, highlight: true },
+    { label: 'Take-Home + Retirement (total kept)', w2: w2TakeHome + w2_401k_total, loc: locTakeHome + loc401kTotal, total: true, highlight: true },
+  );
 
+  const money = v => (v === null || v === undefined) ? '—' : fmt(v);
   document.getElementById('breakdownBody').innerHTML = rows.map(r => {
     if (r.section) return `<tr class="row-section"><td colspan="3">${r.section}</td></tr>`;
-    if (r.raw) return `<tr><td>${r.label}</td><td>${r.w2}</td><td>${r.loc}</td></tr>`;
+    if (r.raw) return `<tr${r.total ? ' class="row-total"' : ''}><td>${r.label}</td><td>${r.w2}</td><td>${r.loc}</td></tr>`;
     const cls  = r.total ? ' class="row-total"' : '';
     const w2c  = r.highlight && r.w2 > 0 ? ' class="positive"' : (r.w2 < 0 ? ' class="negative"' : '');
     const lc   = r.highlight && r.loc > 0 ? ' class="positive"' : (r.loc < 0 ? ' class="negative"' : '');
-    return `<tr${cls}><td>${r.label}</td><td${w2c}>${fmt(r.w2)}</td><td${lc}>${fmt(r.loc)}</td></tr>`;
+    return `<tr${cls}><td>${r.label}</td><td${w2c}>${money(r.w2)}</td><td${lc}>${money(r.loc)}</td></tr>`;
   }).join('');
+
+  // Live hint: show the real employer-contribution cap and flag over-entry.
+  const erNote = document.getElementById('erCapNote');
+  if (erNote) {
+    erNote.textContent = loc401kER_input > loc401kER_max
+      ? `⚠ Capped at ${fmt(loc401kER_max)} this year (${useSCorp ? '25% of W-2 salary' : '~20% of net'} / combined cap). You entered ${fmt(loc401kER_input)}.`
+      : `Max employer contribution this year: ${fmt(loc401kER_max)}`;
+    erNote.style.color = loc401kER_input > loc401kER_max ? 'var(--accent-warn)' : 'var(--text2)';
+  }
 }
 
 recalc();
