@@ -359,6 +359,68 @@
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
+  .qe-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 8px;
+  }
+  .qe-col h4 {
+    font-family: 'Fraunces', serif;
+    font-size: .92rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .qe-col.w2 h4 { color: var(--accent-w2); }
+  .qe-col.loc h4 { color: var(--accent-loc); }
+  .qe-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: .83rem;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+  }
+  .qe-row .qe-label { color: var(--text2); }
+  .qe-row .qe-val { font-weight: 600; }
+  .qe-row.qe-total .qe-label { color: var(--text); font-weight: 600; }
+  .qe-row.qe-total .qe-val { color: var(--accent-warn); font-size: .95rem; }
+  .qe-dates {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .qe-date-cell {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .qe-date-cell .qe-q { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text2); font-weight: 600; margin-bottom: 2px; }
+  .qe-date-cell .qe-d { font-size: .8rem; font-weight: 700; color: var(--text); }
+  .qe-date-cell .qe-period { font-size: .68rem; color: var(--text2); margin-top: 2px; }
+  .qe-date-cell .qe-amt { font-size: .82rem; font-weight: 700; color: var(--accent-warn); margin-top: 4px; }
+  .qe-note {
+    font-size: .75rem;
+    color: var(--text2);
+    margin-top: 12px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    background: var(--bg);
+    border-radius: 6px;
+    border-left: 3px solid var(--accent-warn);
+  }
+  @media (max-width: 700px) {
+    .qe-grid { grid-template-columns: 1fr; }
+    .qe-dates { grid-template-columns: repeat(2, 1fr); }
+  }
+
   /* ===== PRINT / EXPORT STYLES ===== */
   @media print {
     @page { margin: 0.75in; size: letter; }
@@ -599,6 +661,11 @@
       <thead><tr><th>Item</th><th>W-2</th><th>Locum / 1099</th></tr></thead>
       <tbody id="breakdownBody"></tbody>
     </table>
+  </div>
+
+  <div class="breakdown" style="margin-bottom:28px;">
+    <div class="breakdown-title">Quarterly Estimated Tax Payments (2026)</div>
+    <div style="padding:20px 24px;" id="qeBlock"></div>
   </div>
 
   <div class="notes">
@@ -964,6 +1031,74 @@ function recalc() {
       : `Max employer contribution this year: ${fmt(loc401kER_max)}`;
     erNote.style.color = loc401kER_input > loc401kER_max ? 'var(--accent-warn)' : 'var(--text2)';
   }
+
+  // ===== QUARTERLY ESTIMATED TAXES =====
+  // W-2: withholding typically covers income tax + FICA, but show what it costs per quarter
+  // as a reference. Employee has no estimated tax obligation if withholding is adequate.
+  const w2PerQ = w2TotalTax / 4;
+
+  // Locum S-Corp: FICA on salary is handled via payroll deposits (not estimated tax).
+  // Estimated tax covers federal + state income tax on the K-1 distribution and any
+  // income tax shortfall on the W-2 salary if withholding isn't set high enough.
+  // Sole prop: all taxes paid via estimates.
+  const locEstimatedAnnual = locFedTax + locStateTax; // FICA handled via payroll (S-Corp) or included (sole prop)
+  const locPerQ = useSCorp ? locEstimatedAnnual / 4 : locTotalTax / 4;
+
+  // Safe harbor: 90% of current year OR 110% of prior year (if prior AGI > $150k, which it is here)
+  const locSafeHarbor110 = locTotalTax * 1.10 / 4; // 110% of current year as proxy for prior year
+  const locSafeHarbor90  = locTotalTax * 0.90 / 4;
+  const safeHarborQ = Math.min(locSafeHarbor110, locPerQ); // whichever avoids penalty
+
+  const quarters = [
+    { q: 'Q1', due: 'Apr 15, 2026', period: 'Jan 1 – Mar 31' },
+    { q: 'Q2', due: 'Jun 16, 2026', period: 'Apr 1 – May 31' },
+    { q: 'Q3', due: 'Sep 15, 2026', period: 'Jun 1 – Aug 31' },
+    { q: 'Q4', due: 'Jan 15, 2027', period: 'Sep 1 – Dec 31' },
+  ];
+
+  const qRow = (label, val, total=false) =>
+    `<div class="qe-row${total?' qe-total':''}"><span class="qe-label">${label}</span><span class="qe-val">${fmt(val)}</span></div>`;
+
+  document.getElementById('qeBlock').innerHTML = `
+    <div class="qe-grid">
+      <div class="qe-col w2">
+        <h4>W-2 — Tax Withheld by Employer</h4>
+        ${qRow('Federal income tax / yr', w2FedTax)}
+        ${qRow('State income tax / yr', w2StateTax)}
+        ${qRow('FICA withheld / yr', w2FICA)}
+        ${qRow('Total withheld annually', w2TotalTax, true)}
+        <div class="qe-row" style="margin-top:6px;"><span class="qe-label" style="font-size:.75rem;color:var(--text2);font-style:italic;">Withholding covers this automatically — no estimated payments needed unless you have other income.</span></div>
+      </div>
+      <div class="qe-col loc">
+        <h4>Locum 1099 — You Pay Quarterly</h4>
+        ${useSCorp
+          ? qRow('Federal income tax on distribution + salary', locFedTax)
+          : qRow('Federal income tax', locFedTax)}
+        ${qRow('State income tax', locStateTax)}
+        ${useSCorp
+          ? `<div class="qe-row"><span class="qe-label">FICA / payroll tax</span><span class="qe-val" style="color:var(--text2);font-size:.78rem;">via S-Corp payroll</span></div>`
+          : qRow('Self-employment tax', locSETax)}
+        ${qRow('Total estimated tax / yr', useSCorp ? locEstimatedAnnual : locTotalTax, true)}
+        ${qRow('Per quarter (÷4)', locPerQ)}
+      </div>
+    </div>
+    <div class="qe-dates">
+      ${quarters.map(({q,due,period}) => `
+        <div class="qe-date-cell">
+          <div class="qe-q">${q} due</div>
+          <div class="qe-d">${due}</div>
+          <div class="qe-period">${period}</div>
+          <div class="qe-amt">${fmt(locPerQ)}</div>
+        </div>`).join('')}
+    </div>
+    <div class="qe-note">
+      <strong>Safe harbor (avoids underpayment penalty):</strong> Pay at least 90% of this year's tax liability,
+      or 110% of last year's total tax (since your AGI likely exceeds $150k).
+      Whichever is <em>smaller</em> is your safe harbor target — roughly <strong>${fmt(Math.min(locSafeHarbor90, locSafeHarbor110))}/quarter</strong> based on current inputs.
+      ${useSCorp ? ' S-Corp payroll handles FICA deposits separately on a semi-weekly or monthly schedule — those are not included in the quarterly estimates above.' : ''}
+      Pay via IRS Direct Pay or EFTPS. Most states have their own estimated tax system (CO: <em>Revenue Online</em>).
+    </div>
+  `;
 }
 
 recalc();
