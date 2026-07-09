@@ -412,7 +412,7 @@
 
 <div class="page-header">
   <h1>Locum Tenens vs W-2 Employment</h1>
-  <p>Deep financial comparison including taxes, benefits, S-Corp savings, retirement sheltering, write-offs, and true take-home pay</p>
+  <p>Deep financial comparison including taxes, benefits, S-Corp savings, retirement sheltering, write-offs, and true take-home pay &mdash; 2026 tax year</p>
   <button class="export-btn" onclick="window.print()">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
     Export / Print PDF
@@ -470,7 +470,7 @@
 
       <div class="section-label">Retirement</div>
       <div class="field">
-        <label>Your 401k Contribution <span class="hint">% of base salary, max $23,500</span></label>
+        <label>Your 401k Contribution <span class="hint">% of base salary, max $24,500</span></label>
         <input type="text" id="w2401kPct" value="8" oninput="recalc()">
       </div>
       <div class="field">
@@ -533,8 +533,8 @@
 
       <div class="section-label">Retirement — Solo 401k</div>
       <div class="field">
-        <label>Employee Deferral <span class="hint">you → your 401k (max $23,500)</span></label>
-        <input type="text" id="loc401kEmployee" value="23,500" oninput="recalc()">
+        <label>Employee Deferral <span class="hint">you → your 401k (max $24,500)</span></label>
+        <input type="text" id="loc401kEmployee" value="24,500" oninput="recalc()">
       </div>
       <div class="field">
         <label>Employer Profit-Sharing <span class="hint">your biz → your 401k</span></label>
@@ -542,7 +542,7 @@
         <div id="erCapNote" style="font-size:.72rem;color:var(--text2);margin-top:4px;opacity:.85;"></div>
       </div>
       <div style="font-size:.72rem;color:var(--text2);margin-bottom:10px;opacity:.7;line-height:1.5;">
-        Combined cap: $70,000 (under 50) / $77,500 (50+) · Employee deferral hard-capped at $23,500 · Employer portion limited to 25% of S-Corp W-2 salary or ~20% of sole prop adjusted net
+        Combined cap: $72,000 (under 50) / $80,000 (50+) · Employee deferral hard-capped at $24,500 · Employer portion limited to 25% of S-Corp W-2 salary or ~20% of sole prop adjusted net
       </div>
 
       <div class="section-label">S-Corp Election</div>
@@ -604,15 +604,15 @@
   <div class="notes">
     <h3>Methodology & Key Assumptions</h3>
     <ul>
-      <li><strong>Federal Tax Brackets:</strong> Uses 2025 brackets (10%, 12%, 22%, 24%, 32%, 35%, 37%). Taxable income = AGI minus the greater of standard or itemized deductions.</li>
-      <li><strong>2025 Standard Deductions:</strong> Single $15,000 · Married Filing Jointly $30,000 · Head of Household $22,500.</li>
-      <li><strong>Self-Employment Tax:</strong> 15.3% on 92.35% of net SE income (Social Security on first $176,100, Medicare uncapped). The deductible half of SE tax is accounted for.</li>
+      <li><strong>Federal Tax Brackets:</strong> Uses 2026 brackets (10%, 12%, 22%, 24%, 32%, 35%, 37%) per IRS Rev. Proc. 2025-32 and OBBBA permanent extension. Taxable income = AGI minus the greater of standard or itemized deductions.</li>
+      <li><strong>2026 Standard Deductions:</strong> Single $16,100 · Married Filing Jointly $32,200 · Head of Household $24,150.</li>
+      <li><strong>Self-Employment Tax:</strong> 15.3% on 92.35% of net SE income (Social Security on first $184,500 for 2026, Medicare uncapped). The deductible half of SE tax is accounted for.</li>
       <li><strong>S-Corp Savings:</strong> Only the "reasonable salary" owes FICA (7.65% employee + 7.65% employer). Distributions above salary avoid SE tax. The employer-side FICA is a deductible business expense.</li>
-      <li><strong>Solo 401k — Employee Deferral:</strong> This is money YOU put in, just like contributing to a regular 401k at a job. Hard-capped at $23,500/yr (under 50). Reduces your taxable income dollar for dollar.</li>
-      <li><strong>Solo 401k — Employer Profit-Sharing:</strong> Since you own the business, your business can ALSO contribute on top of the employee deferral. Limited to 25% of your S-Corp W-2 salary, or ~20% of sole prop adjusted net. Combined with employee deferral, the total cap is $70,000 ($77,500 if 50+). The field auto-caps to the allowed amount and shows the max under the input.</li>
+      <li><strong>Solo 401k — Employee Deferral:</strong> This is money YOU put in, just like contributing to a regular 401k at a job. Hard-capped at $24,500/yr (under 50) for 2026. Reduces your taxable income dollar for dollar.</li>
+      <li><strong>Solo 401k — Employer Profit-Sharing:</strong> Since you own the business, your business can ALSO contribute on top of the employee deferral. Limited to 25% of your S-Corp W-2 salary, or ~20% of sole prop adjusted net. Combined with employee deferral, the total cap is $72,000 ($80,000 if 50+) for 2026. The field auto-caps to the allowed amount and shows the max under the input.</li>
       <li><strong>Profit-Sharing reduces distribution &amp; take-home:</strong> The employer contribution is a deductible business expense — it lowers your S-Corp K-1 distribution (and taxable pass-through income) and, since it's money locked into retirement, it reduces spendable take-home. Raising it shifts dollars from taxable cash into tax-sheltered savings.</li>
       <li><strong>Take-Home definition:</strong> Spendable cash only = taxable gross − all taxes − self-funded expenses − ALL retirement contributions (employee + employer) + non-taxable reimbursements. Retirement wealth is reported separately in the Bottom Line.</li>
-      <li><strong>W-2 401k:</strong> Your chosen contribution % applied to base salary (capped at $23,500), plus employer match. Overtime and bonuses not included in 401k calculation.</li>
+      <li><strong>W-2 401k:</strong> Your chosen contribution % applied to base salary (capped at $24,500 for 2026), plus employer match. Overtime and bonuses not included in 401k calculation.</li>
       <li><strong>Overtime Pay (W-2):</strong> Added to gross income, subject to all taxes. Not included in 401k contribution base (most employer plans use base salary only).</li>
       <li><strong>Travel Reimbursement (Locum):</strong> Treated as accountable plan reimbursement — non-taxable, not included in gross income. Directly increases your take-home without tax impact.</li>
       <li><strong>Sign-On / Relocation Bonuses (Locum):</strong> Treated as taxable income added to gross revenue.</li>
@@ -630,12 +630,12 @@ function pn(v) { return parseFloat(String(v).replace(/[^0-9.\-]/g, '')) || 0; }
 function fmt(n) { return n < 0 ? '-$' + Math.abs(Math.round(n)).toLocaleString() : '$' + Math.round(n).toLocaleString(); }
 function pct(n) { return (n * 100).toFixed(1) + '%'; }
 
-// 2025 federal tax brackets
+// 2026 federal tax brackets (Rev. Proc. 2025-32, OBBBA permanent extension)
 function fedTax(taxable, status) {
   const brackets = {
-    single: [[11925,.10],[48475,.12],[103350,.22],[197300,.24],[250525,.32],[626350,.35],[Infinity,.37]],
-    mfj:    [[23850,.10],[96950,.12],[206700,.22],[394600,.24],[501050,.32],[751600,.35],[Infinity,.37]],
-    hoh:    [[17000,.10],[64850,.12],[103350,.22],[197300,.24],[250500,.32],[626350,.35],[Infinity,.37]],
+    single: [[12250,.10],[49825,.12],[105700,.22],[201775,.24],[256225,.32],[640600,.35],[Infinity,.37]],
+    mfj:    [[24800,.10],[99600,.12],[211400,.22],[403550,.24],[512450,.32],[768700,.35],[Infinity,.37]],
+    hoh:    [[17450,.10],[66650,.12],[105700,.22],[201775,.24],[256225,.32],[640600,.35],[Infinity,.37]],
   };
   let b = brackets[status] || brackets.single;
   let tax = 0, prev = 0;
@@ -649,9 +649,9 @@ function fedTax(taxable, status) {
   return Math.max(tax, 0);
 }
 
-// 2025 standard deductions
+// 2026 standard deductions
 function stdDeduction(status) {
-  return { single: 15000, mfj: 30000, hoh: 22500 }[status] || 15000;
+  return { single: 16100, mfj: 32200, hoh: 24150 }[status] || 16100;
 }
 
 function recalc() {
@@ -690,10 +690,10 @@ function recalc() {
 
   document.getElementById('salaryField').style.display = useSCorp ? 'block' : 'none';
 
-  // 2025 constants
-  const ssCap = 176100;
-  const ee401kCap = 23500;
-  const combined401kCap = 70000;
+  // 2026 constants
+  const ssCap = 184500;
+  const ee401kCap = 24500;
+  const combined401kCap = 72000;
   const addlMedThresh = status === 'mfj' ? 250000 : 200000;
 
   // ===== W-2 CALCULATIONS =====
